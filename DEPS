@@ -429,6 +429,11 @@ deps_os = {
     # Wireless Display Software. Used on Chrome OS.
     'src/third_party/wds/src':
      Var('chromium_git') + '/external/github.com/01org/wds' + '@' + 'ac3d8210d95f3000bf5c8e16a79dbbbf22d554a5',
+
+    # Used for depth stream capture.
+    'src/third_party/librealsense/src':
+    #Var('chromium_git') + '/external/github.com/IntelRealSense/librealsense' + '@' + '710587036e8b74784cf598aeb68af1809a712546',
+     'https://github.com/IntelRealSense/librealsense.git' + '@' + 'v0.9.2',
   },
   'android': {
     'src/third_party/android_protobuf/src':

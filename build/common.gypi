@@ -3577,6 +3577,7 @@
     ['(OS=="linux" or OS=="android") and asan==0 and msan==0 and tsan==0 and ubsan==0 and ubsan_security==0 and ubsan_vptr==0 and cfi_diag==0', {
       'target_defaults': {
         'ldflags': [
+          '-latomic',
           '-Wl,-z,defs',
         ],
       },

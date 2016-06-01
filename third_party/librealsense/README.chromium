@@ -1,0 +1,18 @@
+Name: librealsense
+URL: https://github.com/IntelRealSense/librealsense
+Version: 0.9.2
+License: Apache 2.0
+License File: src/LICENSE
+Security Critical: yes
+
+Description:
+librealsense is a cross-platform library (Linux, OSX, Windows) for capturing data from the Intel® RealSense™ F200, SR300 and R200 cameras.
+
+Modifications:
+- None
+
+To import a new snapshot of librealsense:
+- Checkout the latest release tag: 'git checkout v0.9.2'.
+- Change the DEPS entry to the newly checked out commit.
+- Update 'librealsense.gyp' and 'BUILD.gn' files in 'librealsense' folder if needed.
+- Update this README to reflect the new version number.

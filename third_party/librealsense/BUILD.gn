@@ -1,0 +1,74 @@
+# Copyright 2016 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/linux/pkg_config.gni")
+
+config("librealsense_config") {
+  include_dirs = [ "src/include" ]
+}
+
+# gn definition use_sysroot=false is needed to build in linux
+if (is_linux || is_mac) {
+  static_library("libuvc") {
+    sources = [
+      "src/src/libuvc/ctrl.c",
+      "src/src/libuvc/dev.c",
+      "src/src/libuvc/diag.c",
+      "src/src/libuvc/frame.c",
+      "src/src/libuvc/init.c",
+      "src/src/libuvc/stream.c",
+    ]
+    deps = [
+      "//third_party/libusb",
+    ]
+  }
+}
+
+static_library("librealsense") {
+  sources = [
+    "src/src/context.cpp",
+    "src/src/device.cpp",
+    "src/src/f200-private.cpp",
+    "src/src/f200.cpp",
+    "src/src/image.cpp",
+    "src/src/log.cpp",
+    "src/src/r200-private.cpp",
+    "src/src/r200.cpp",
+    "src/src/rs.cpp",
+    "src/src/stream.cpp",
+    "src/src/sync.cpp",
+    "src/src/types.cpp",
+    "src/src/uvc-libuvc.cpp",
+    "src/src/uvc-v4l2.cpp",
+    "src/src/uvc-wmf.cpp",
+    "src/src/uvc.cpp",
+    "src/src/verify.c",
+  ]
+
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+
+  public_configs = [ ":librealsense_config" ]
+
+  deps = [
+    "//third_party/libusb",
+  ]
+
+  if (is_linux || is_mac) {
+    deps += [ ":libuvc" ]
+  }
+  if (is_linux) {
+    defines = [ "RS_USE_V4L2_BACKEND" ]
+    cflags = [ "-mssse3" ]
+    configs -= [ "//build/config/gcc:no_exceptions" ]
+  }
+
+  # TODO(dshwang): support mac and win later. crbug.com/616098
+  if (is_mac) {
+    defines = [ "RS_USE_LIBUVC_BACKEND" ]
+  }
+  if (is_win) {
+    defines = [ "RS_USE_WMF_BACKEND" ]
+  }
+}
