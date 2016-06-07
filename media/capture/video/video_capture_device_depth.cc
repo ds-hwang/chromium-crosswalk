@@ -158,6 +158,8 @@ void VideoCaptureDeviceDepth::AllocateAndStart(const VideoCaptureParams& params,
     return;  // Wrong state.
   depth_stream_thread_.Start();
 
+  LOG(ERROR)<<"HEREEEEEEEEEEEE";
+
   capture_impl_ = new DepthStreamCaptureDelegate(
       device_name_, depth_stream_thread_.task_runner());
   if (!capture_impl_) {

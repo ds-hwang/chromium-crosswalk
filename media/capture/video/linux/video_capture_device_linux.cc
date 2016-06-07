@@ -13,6 +13,8 @@
 #include "build/build_config.h"
 #include "media/capture/video/linux/v4l2_capture_delegate.h"
 
+#include "base/debug/stack_trace.h"
+
 #if defined(OS_OPENBSD)
 #include <sys/videoio.h>
 #else

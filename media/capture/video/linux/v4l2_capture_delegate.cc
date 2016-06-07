@@ -17,6 +17,7 @@
 #include "build/build_config.h"
 #include "media/base/bind_to_current_loop.h"
 #include "media/capture/video/linux/video_capture_device_linux.h"
+#include "base/debug/stack_trace.h"
 
 namespace media {
 

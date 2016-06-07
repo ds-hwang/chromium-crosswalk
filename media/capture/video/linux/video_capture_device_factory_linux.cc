@@ -33,6 +33,8 @@
 #include "media/capture/video/video_capture_device_depth_null.h"
 #endif
 
+#include "base/debug/stack_trace.h"
+
 namespace media {
 
 static bool HasUsableFormats(int fd, uint32_t capabilities) {
@@ -144,6 +146,9 @@ std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryLinux::Create(
   DCHECK(thread_checker_.CalledOnValidThread());
 
   std::unique_ptr<VideoCaptureDevice> self;
+  LOG(ERROR) << "Create:" << device_name.GetCaptureApiTypeString();
+  base::debug::StackTrace st;
+  st.Print();
   if (device_name.capture_api_type() ==
       VideoCaptureDevice::Name::DEPTH_STREAM) {
     DCHECK(use_depth_stream_);
@@ -179,6 +184,8 @@ void VideoCaptureDeviceFactoryLinux::GetDeviceNames(
   base::FileEnumerator enumerator(path, false, base::FileEnumerator::FILES,
                                   "video*");
 
+  LOG(ERROR) << "GetDeviceNames";
+
   while (!enumerator.Next().empty()) {
     const base::FileEnumerator::FileInfo info = enumerator.GetInfo();
     const std::string unique_id = path.value() + info.GetName().value();
@@ -212,6 +219,12 @@ void VideoCaptureDeviceFactoryLinux::GetDeviceSupportedFormats(
   DCHECK(thread_checker_.CalledOnValidThread());
   if (device.id().empty())
     return;
+
+  LOG(ERROR) << "GetDeviceSupportedFormats: type:"
+             << device.GetCaptureApiTypeString();
+  base::debug::StackTrace st;
+  st.Print();
+
   if (device.capture_api_type() == VideoCaptureDevice::Name::DEPTH_STREAM) {
     DCHECK(use_depth_stream_);
     VideoCaptureDeviceDepth::GetDeviceSupportedFormats(device,
