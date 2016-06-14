@@ -9,10 +9,12 @@
 #include <stdint.h>
 #include <sys/ioctl.h>
 
+#include "base/command_line.h"
 #include "base/files/file_enumerator.h"
 #include "base/files/scoped_file.h"
 #include "base/posix/eintr_wrapper.h"
 #include "build/build_config.h"
+#include "media/base/media_switches.h"
 
 #if defined(OS_OPENBSD)
 #include <sys/videoio.h>
@@ -24,6 +26,12 @@
 #include "media/capture/video/linux/video_capture_device_chromeos.h"
 #endif
 #include "media/capture/video/linux/video_capture_device_linux.h"
+
+#if defined(USE_DEPTH_STREAM)
+#include "media/capture/video/video_capture_device_depth.h"
+#else
+#include "media/capture/video/video_capture_device_depth_null.h"
+#endif
 
 namespace media {
 
@@ -123,6 +131,9 @@ static void GetSupportedFormatsForV4L2BufferType(
 VideoCaptureDeviceFactoryLinux::VideoCaptureDeviceFactoryLinux(
     scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner)
     : ui_task_runner_(ui_task_runner) {
+  const base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
+  use_depth_stream_ = cmd_line->HasSwitch(switches::kUseDepthStreamCapture) &&
+                      VideoCaptureDeviceDepth::IsSupported();
 }
 
 VideoCaptureDeviceFactoryLinux::~VideoCaptureDeviceFactoryLinux() {
@@ -131,25 +142,33 @@ VideoCaptureDeviceFactoryLinux::~VideoCaptureDeviceFactoryLinux() {
 std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryLinux::Create(
     const VideoCaptureDevice::Name& device_name) {
   DCHECK(thread_checker_.CalledOnValidThread());
+
+  std::unique_ptr<VideoCaptureDevice> self;
+  if (device_name.capture_api_type() ==
+      VideoCaptureDevice::Name::DEPTH_STREAM) {
+    DCHECK(use_depth_stream_);
+    DVLOG(1) << " DEPTH_STREAM Device: " << device_name.name();
+    self.reset(new VideoCaptureDeviceDepth(device_name));
+    return self;
+  }
+
 #if defined(OS_CHROMEOS)
-  VideoCaptureDeviceChromeOS* self =
-      new VideoCaptureDeviceChromeOS(ui_task_runner_, device_name);
+  self.reset(new VideoCaptureDeviceChromeOS(ui_task_runner_, device_name));
 #else
-  VideoCaptureDeviceLinux* self = new VideoCaptureDeviceLinux(device_name);
+  self.reset(new VideoCaptureDeviceLinux(device_name));
 #endif
   if (!self)
-    return std::unique_ptr<VideoCaptureDevice>();
+    return nullptr;
   // Test opening the device driver. This is to make sure it is available.
   // We will reopen it again in our worker thread when someone
   // allocates the camera.
   base::ScopedFD fd(HANDLE_EINTR(open(device_name.id().c_str(), O_RDONLY)));
   if (!fd.is_valid()) {
     DLOG(ERROR) << "Cannot open device";
-    delete self;
-    return std::unique_ptr<VideoCaptureDevice>();
+    return nullptr;
   }
 
-  return std::unique_ptr<VideoCaptureDevice>(self);
+  return self;
 }
 
 void VideoCaptureDeviceFactoryLinux::GetDeviceNames(
@@ -182,6 +201,9 @@ void VideoCaptureDeviceFactoryLinux::GetDeviceNames(
           VideoCaptureDevice::Name::V4L2_SINGLE_PLANE));
     }
   }
+
+  if (use_depth_stream_)
+    VideoCaptureDeviceDepth::GetDeviceNames(device_names);
 }
 
 void VideoCaptureDeviceFactoryLinux::GetDeviceSupportedFormats(
@@ -190,6 +212,12 @@ void VideoCaptureDeviceFactoryLinux::GetDeviceSupportedFormats(
   DCHECK(thread_checker_.CalledOnValidThread());
   if (device.id().empty())
     return;
+  if (device.capture_api_type() == VideoCaptureDevice::Name::DEPTH_STREAM) {
+    DCHECK(use_depth_stream_);
+    VideoCaptureDeviceDepth::GetDeviceSupportedFormats(device,
+                                                       supported_formats);
+    return;
+  }
   base::ScopedFD fd(HANDLE_EINTR(open(device.id().c_str(), O_RDONLY)));
   if (!fd.is_valid())  // Failed to open this device.
     return;

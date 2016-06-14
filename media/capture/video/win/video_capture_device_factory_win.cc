@@ -380,6 +380,7 @@ std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryWin::Create(
     const Name& device_name) {
   DCHECK(thread_checker_.CalledOnValidThread());
   std::unique_ptr<VideoCaptureDevice> device;
+
   if (device_name.capture_api_type() == Name::MEDIA_FOUNDATION) {
     DCHECK(PlatformSupportsMediaFoundation());
     device.reset(new VideoCaptureDeviceMFWin(device_name));

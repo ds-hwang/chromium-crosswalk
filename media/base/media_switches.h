@@ -32,6 +32,7 @@ MEDIA_EXPORT extern const char kAlsaOutputDevice[];
 #endif
 
 MEDIA_EXPORT extern const char kUseGpuMemoryBuffersForCapture[];
+MEDIA_EXPORT extern const char kUseDepthStreamCapture[];
 
 #if defined(OS_WIN)
 MEDIA_EXPORT extern const char kEnableExclusiveAudio[];

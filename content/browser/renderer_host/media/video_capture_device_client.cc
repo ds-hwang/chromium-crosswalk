@@ -215,8 +215,9 @@ void VideoCaptureDeviceClient::OnIncomingCapturedData(
 
   // The input |length| can be greater than the required buffer size because of
   // paddings and/or alignments, but it cannot be smaller.
-  DCHECK_GE(static_cast<size_t>(length), frame_format.ImageAllocationSize());
-
+//  DCHECK_GE(static_cast<size_t>(length), frame_format.ImageAllocationSize());
+  if (static_cast<size_t>(length) < frame_format.ImageAllocationSize())
+    LOG(ERROR)<<"Alloc mismatch:"<<length<< " vs "<<frame_format.ImageAllocationSize();
   if (external_jpeg_decoder_) {
     const VideoCaptureGpuJpegDecoder::STATUS status =
         external_jpeg_decoder_->GetStatus();

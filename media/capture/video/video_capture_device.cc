@@ -85,6 +85,8 @@ const char* VideoCaptureDevice::Name::GetCaptureApiTypeString() const {
   switch (capture_api_type()) {
     case V4L2_SINGLE_PLANE:
       return "V4L2 SPLANE";
+    case DEPTH_STREAM:
+      return "DEPTH_STREAM";
     default:
       NOTREACHED() << "Unknown Video Capture API type!";
       return "Unknown API";

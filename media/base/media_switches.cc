@@ -43,6 +43,9 @@ const char kAlsaOutputDevice[] = "alsa-output-device";
 const char kUseGpuMemoryBuffersForCapture[] =
     "use-gpu-memory-buffers-for-capture";
 
+// Use depth stream capture.
+const char kUseDepthStreamCapture[] = "use-depth-stream-capture";
+
 #if defined(OS_WIN)
 // Use exclusive mode audio streaming for Windows Vista and higher.
 // Leads to lower latencies for audio streams which uses the

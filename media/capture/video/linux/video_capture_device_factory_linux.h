@@ -32,6 +32,7 @@ class MEDIA_EXPORT VideoCaptureDeviceFactoryLinux
 
  private:
   scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner_;
+  bool use_depth_stream_;
   DISALLOW_COPY_AND_ASSIGN(VideoCaptureDeviceFactoryLinux);
 };
 

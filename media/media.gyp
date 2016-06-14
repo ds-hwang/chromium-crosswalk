@@ -11,6 +11,8 @@
     # (DT_NEEDED) instead of using dlopen. This helps with automated
     # detection of ABI mismatches and prevents silent errors.
     'linux_link_pulseaudio%': 0,
+    # Option to use depth stream capture.
+    'use_depth_stream%': 0,
     'conditions': [
       # Enable ALSA and Pulse for runtime selection.
       ['(OS=="linux" or OS=="freebsd" or OS=="solaris") and (embedded==0 or chromecast==1)', {
@@ -825,6 +827,29 @@
             ['use_udev==1', {
               'dependencies': [
                 '<(DEPTH)/device/udev_linux/udev.gyp:udev_linux',
+              ],
+            }],
+            ['use_depth_stream==1', {
+              'defines': [
+                'USE_DEPTH_STREAM',
+              ],
+              'dependencies': [
+                '../third_party/librealsense/librealsense.gyp:librealsense',
+              ],
+              'sources': [
+                'capture/video/video_capture_device_depth.cc',
+                'capture/video/video_capture_device_depth.h',
+              ],
+              'cflags!': [
+                '-fno-exceptions',
+              ],
+              'cflags_cc!': [
+                '-fno-exceptions',
+              ],
+            }, {  # else use_depth_stream==0
+              'sources': [
+                'capture/video/video_capture_device_depth_null.cc',
+                'capture/video/video_capture_device_depth_null.h',
               ],
             }],
           ],

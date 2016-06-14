@@ -115,6 +115,23 @@ source_set("capture") {
     ]
   }
 
+  if (use_depth_stream) {
+    if (use_depth_stream) {
+      defines = [ "USE_DEPTH_STREAM" ]
+    }
+    deps += [ "//third_party/librealsense" ]
+    sources += [
+      "video/video_capture_device_depth.cc",
+      "video/video_capture_device_depth.h",
+    ]
+    configs -= [ "//build/config/gcc:no_exceptions" ]
+  } else {
+    sources += [
+      "video/video_capture_device_depth_null.cc",
+      "video/video_capture_device_depth_null.h",
+    ]
+  }
+
   if (is_win) {
     public_deps += [ "//media/base/win" ]
     libs = [

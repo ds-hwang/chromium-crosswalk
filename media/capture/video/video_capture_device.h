@@ -56,10 +56,7 @@ class MEDIA_EXPORT VideoCaptureDevice {
 
 #if defined(OS_LINUX)
     // Linux/CrOS targets Capture Api type: it can only be set on construction.
-    enum CaptureApiType {
-      V4L2_SINGLE_PLANE,
-      API_TYPE_UNKNOWN
-    };
+    enum CaptureApiType { V4L2_SINGLE_PLANE, DEPTH_STREAM, API_TYPE_UNKNOWN };
 #elif defined(OS_WIN)
     // Windows targets Capture Api type: it can only be set on construction.
     enum CaptureApiType { MEDIA_FOUNDATION, DIRECT_SHOW, API_TYPE_UNKNOWN };

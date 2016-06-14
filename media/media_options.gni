@@ -30,6 +30,9 @@ declare_args() {
   # Override to dynamically link the cras (ChromeOS audio) library.
   use_cras = false
 
+  # Option to use depth stream capture.
+  use_depth_stream = false
+
   # Use low-memory buffers on non-Android builds of Chromecast.
   use_low_memory_buffer = is_chromecast && !is_android
 
